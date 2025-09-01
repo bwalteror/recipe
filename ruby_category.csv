@@ -1,0 +1,9 @@
+﻿name,image,cook_id
+Bread,category_card/rubybread.png,ruby
+Desserts,category_card/rubydesserts.png,ruby
+Entrees,category_card/rubyentrees.png,ruby
+Jellies,category_card/rubyjellies.png,ruby
+Misc,category_card/rubymisc.png,ruby
+Salads,category_card/rubysalads.png,ruby
+Sides,category_card/rubysides.png,ruby
+Various,category_card/rubyvarious.png,ruby

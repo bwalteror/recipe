@@ -1,0 +1,44 @@
+{% extends "recipes/base.html" %}
+{% block page_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block banner_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block show_home_button %}
+    <a href="{% url 'select_cook' %}" style="margin-right:1em;">Select Cook/Collection</a>
+{% endblock %}
+{% block content %}
+    <div style="display:flex; justify-content:center; align-items:flex-start; gap:2em; margin-bottom:2em; flex-wrap:wrap;">
+        <div style="flex:1; min-width:150px; max-width:250px;">
+            {% if 'http' in cook_obj.cook_head_shot or '/' in cook_obj.cook_head_shot %}
+                <img src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:120px; width:auto; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
+            {% else %}
+                <img src="/media/{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:120px; width:auto; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
+            {% endif %}
+        </div>
+        <div style="flex:1; min-width:150px; max-width:250px;">
+            {% if 'http' in cook_obj.recipe_box_image or '/' in cook_obj.recipe_box_image %}
+                <img src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:120px; width:auto; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
+            {% else %}
+                <img src="/media/{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:120px; width:auto; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
+            {% endif %}
+        </div>
+        <div style="flex:1; min-width:220px; max-width:400px;">
+            <form method="get" action="{% url 'recipes:search_results' %}" style="text-align:right; margin-bottom:1em;">
+                <input type="text" name="q" placeholder="Search recipes..." style="padding:0.5em; width:70%; border-radius:8px; border:1px solid #a67c52;">
+                <button type="submit" class="btn">Search</button>
+            </form>
+            <div style="text-align:right; margin-bottom:1em;">
+                <a href="{% url 'recipes:favorites_list' %}" class="btn favorites-btn" style="font-size:1.1em; padding:0.7em 1.5em; background:#ffd700; color:#4b3e2e; border:2px solid #a67c52;">
+                    ⭐ View Favorites
+                </a>
+            </div>
+        </div>
+    </div>
+    <h2 style="text-align:center;">{{ cook_obj.cook_full }}'s Categories</h2>
+    <div class="grid" style="justify-content:center;">
+        {% for category in categories %}
+            <a href="{% url 'recipes:recipe_list' category.name cook_obj.cook %}" class="card">
+                <img src="/media/{{ category.image }}" alt="{{ category.name }} card">
+                <div style="font-size:1.1em; font-weight:bold;">{{ category.name }}</div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

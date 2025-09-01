@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block page_title %}Fern's Recipe Box{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: #f8f5f0;
+            color: #4b3e2e;
+            margin: 0;
+        }
+        .navbar {
+            background: #a67c52;
+            padding: 1em 2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: #fffbe6;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin-right: 1em;
+        }
+        .navbar a:last-child {
+            margin-right: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2em auto;
+            background: #fffbe6;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #d2b48c;
+            padding: 2em;
+        }
+        h1, h2, h3 {
+            font-family: 'Georgia', serif;
+            color: #7c5c38;
+        }
+        .btn {
+            background: #d2b48c;
+            color: #4b3e2e;
+            border: none;
+            padding: 0.7em 1.5em;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0.5em 0;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #a67c52;
+            color: #fffbe6;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5em;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px #d2b48c;
+            text-align: center;
+            padding: 1em;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px #a67c52;
+        }
+        .card img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 0.5em;
+        }
+        .star {
+            color: gold;
+            font-size: 1.3em;
+            vertical-align: middle;
+        }
+        @media print {
+            .navbar, .btn, .print-hide, .favorites-btn { display: none !important; }
+            body, .container { background: #fff; color: #000; box-shadow: none; }
+            @page {
+                size: Letter portrait;
+                margin: 1in;
+            }
+            .container {
+                /* 67% of letter portrait: 8.5in x 11in => 5.695in x 7.37in */
+                max-width: 5.7in !important;
+                max-height: 7.4in !important;
+                width: auto !important;
+                height: auto !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                overflow: hidden !important;
+            }
+            img#print-image, img#recipe-image {
+                max-width: 5.7in !important;
+                max-height: 7.4in !important;
+                width: auto !important;
+                height: auto !important;
+                page-break-inside: avoid;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            img {
+                max-width: 100% !important;
+                max-height: 100% !important;
+                height: auto !important;
+                page-break-inside: avoid;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+        .view-count {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #a67c52;
+            color: #fffbe6;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            font-size: 0.9em;
+            z-index: 100;
+            box-shadow: 0 2px 8px #d2b48c;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="navbar print-hide" style="justify-content:center;">
+        <div style="display:flex; align-items:center; justify-content:center; width:100%;">
+            <a href="{% url 'recipes:category_list' %}" style="text-decoration:none;">
+                <span style="font-size:2em; font-family:'Georgia',serif; font-weight:bold; color:#fffbe6; margin-right:2em; letter-spacing:1px;">
+                    {% block banner_title %}Fern's Recipe Box{% endblock %}
+                </span>
+            </a>
+            {% block show_home_button %}<a href="{% url 'recipes:category_list' %}" style="margin-right:1em;">Home</a>{% endblock %}
+            <a href="{% url 'recipes:about_page' %}">About</a>
+        </div>
+    </div>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

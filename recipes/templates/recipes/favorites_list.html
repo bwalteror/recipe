@@ -1,0 +1,26 @@
+{% extends "recipes/base.html" %}
+{% block page_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block banner_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block show_home_button %}
+    <a href="{% url 'select_cook' %}" style="margin-right:1em;">Select Cook/Collection</a>
+{% endblock %}
+{% block content %}
+    <h2>{{ cook_obj.cook_app }}</h2>
+    <div style="display:flex; gap:2em; margin-bottom:2em;">
+        {% if 'http' in cook_obj.cook_head_shot or '/' in cook_obj.cook_head_shot %}
+            <img src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% else %}
+            <img src="/media/{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% endif %}
+        {% if 'http' in cook_obj.recipe_box_image or '/' in cook_obj.recipe_box_image %}
+            <img src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% else %}
+            <img src="/media/{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% endif %}
+    </div>
+<ul>
+    {% for recipe in recipes %}
+    <li><a href="{% url 'recipes:recipe_detail' recipe.id %}">{{ recipe.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

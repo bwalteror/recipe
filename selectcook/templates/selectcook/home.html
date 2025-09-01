@@ -1,0 +1,21 @@
+{% extends "recipes/base.html" %}
+{% block page_title %}Select a Cook's Collection{% endblock %}
+{% block banner_title %}Select a Cook's Collection{% endblock %}
+{% block show_home_button %}{% endblock %}
+{% block content %}
+<h2 style="text-align:center; margin-bottom:2em;">Select a Cook's Collection</h2>
+<form method="post" style="display:flex; flex-wrap:wrap; gap:2em; justify-content:center;">
+    {% csrf_token %}
+    {% for cook in cooks %}
+    <button type="submit" name="cook" value="{{ cook.cook }}" style="border:2px solid #a67c52; background:#fff; padding:1em; border-radius:16px; display:flex; flex-direction:column; align-items:center; min-width:260px; max-width:320px; cursor:pointer;">
+        <div style="display:flex; gap:1em; margin-bottom:1em;">
+            <img src="/media/{{ cook.cook_head_shot }}" alt="{{ cook.cook_full }} Headshot" style="height:120px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+            <img src="/media/{{ cook.recipe_box_image }}" alt="{{ cook.cook_app }}" style="height:120px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        </div>
+        <div style="font-weight:bold; font-size:1.1em;">{{ cook.cook_full }}</div>
+        <div style="font-size:0.95em; color:#555;">Short Name: {{ cook.cook }}</div>
+        <div style="font-size:0.95em; color:#555;">Web App: {{ cook.cook_app }}</div>
+    </button>
+    {% endfor %}
+</form>
+{% endblock %}

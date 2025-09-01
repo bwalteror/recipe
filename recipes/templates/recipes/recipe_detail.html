@@ -1,0 +1,63 @@
+{% extends "recipes/base.html" %}
+{% block page_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block banner_title %}{{ cook_obj.cook_app }}{% endblock %}
+{% block show_home_button %}
+    <a href="{% url 'select_cook' %}" style="margin-right:1em;">Select Cook/Collection</a>
+{% endblock %}
+{% block extra_head %}
+<script>
+function printRecipe() {
+    window.print();
+}
+
+async function copyImageToClipboard() {
+    const img = document.getElementById('recipe-image');
+    try {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+            new window.ClipboardItem({ [blob.type]: blob })
+        ]);
+        alert('Recipe image copied to clipboard!');
+    } catch (err) {
+        alert('Failed to copy image. Your browser may not support this feature.');
+    }
+}
+</script>
+{% endblock %}
+{% block content %}
+    <div style="display:flex; gap:2em; margin-bottom:2em;">
+        {% if cook_obj and 'http' in cook_obj.cook_head_shot %}
+            <img class="print-hide" src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% elif cook_obj and '/' in cook_obj.cook_head_shot %}
+            <img class="print-hide" src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% elif cook_obj %}
+            <img class="print-hide" src="/media/{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% endif %}
+        {% if cook_obj and 'http' in cook_obj.recipe_box_image %}
+            <img class="print-hide" src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% elif cook_obj and '/' in cook_obj.recipe_box_image %}
+            <img class="print-hide" src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% elif cook_obj %}
+            <img class="print-hide" src="/media/{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
+        {% endif %}
+    </div>
+    <div class="print-copy-info" style="text-align:center; font-size:1.1em; margin-bottom:1em;">
+        From {{ cook_obj.cook_app }}, {{ cook_obj.cook_full }}'s collection of recipes!
+    </div>
+    <h1>{{ recipe.name }}</h1>
+    {% if recipe.is_favorite %}
+        <div>
+            <span class="star">⭐</span>
+            <span style="color:gold; font-weight:bold;">A family favorite recipe!</span>
+        </div>
+    {% endif %}
+    <button class="btn print-hide" onclick="printRecipe()">Print Recipe</button>
+    <button class="btn print-hide" onclick="copyImageToClipboard()">Copy Image to Clipboard</button>
+    <div style="margin:2em 0;">
+        <img id="recipe-image" src="/media/{{ recipe.image }}" alt="{{ recipe.name }}" style="max-width:66%; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
+    </div>
+    <div class="view-count print-hide">
+        Views: {{ recipe.view_count }}
+    </div>
+{% endblock %}

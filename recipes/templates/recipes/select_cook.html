@@ -1,0 +1,25 @@
+{% extends "recipes/base.html" %}
+{% block content %}
+<h2>Select a Cook</h2>
+<form method="post" style="display:flex; justify-content:center; gap:2em;">
+    {% csrf_token %}
+    {% for cook in cooks %}
+    <button type="submit" name="cook" value="{{ cook.cook }}" style="border:2px solid #a67c52; background:#fff; padding:1em; border-radius:16px; display:flex; flex-direction:column; align-items:center;">
+        <div style="display:flex; gap:1em;">
+            {% if 'http' in cook.cook_head_shot or '/' in cook.cook_head_shot %}
+                <img src="{{ cook.cook_head_shot }}" alt="{{ cook.cook_full }} Headshot" style="height:120px; width:auto; border-radius:12px;">
+            {% else %}
+                <img src="/media/{{ cook.cook_head_shot }}" alt="{{ cook.cook_full }} Headshot" style="height:120px; width:auto; border-radius:12px;">
+            {% endif %}
+            {% if 'http' in cook.recipe_box_image or '/' in cook.recipe_box_image %}
+                <img src="{{ cook.recipe_box_image }}" alt="{{ cook.cook_app }}" style="height:120px; width:auto; border-radius:12px;">
+            {% else %}
+                <img src="/media/{{ cook.recipe_box_image }}" alt="{{ cook.cook_app }}" style="height:120px; width:auto; border-radius:12px;">
+            {% endif %}
+        </div>
+        <div style="margin-top:0.5em; font-weight:bold;">{{ cook.cook_full }}</div>
+        <div style="font-size:0.9em; color:#555;">{{ cook.cook_app }}</div>
+    </button>
+    {% endfor %}
+</form>
+{% endblock %}
