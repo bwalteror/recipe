@@ -12,7 +12,12 @@
 </div>
 <ul>
     {% for recipe in recipes %}
-    <li><a href="{% url 'recipes:recipe_detail' recipe.pk %}">{{ recipe.name }}</a></li>
+    <li>
+        {% if recipe.is_favorite %}
+            <span class="star">⭐</span>
+        {% endif %}
+        <a href="{% url 'recipes:recipe_detail' recipe.pk %}">{{ recipe.name }}</a>
+    </li>
     {% endfor %}
 </ul>
 {% endblock %}

@@ -15,6 +15,13 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='images/')
     is_favorite = models.BooleanField(default=False)
     view_count = models.PositiveIntegerField(default=0)
+    title = models.JSONField(blank=True, null=True)
+    description = models.JSONField(blank=True, null=True)
+    meta = models.JSONField(blank=True, null=True)
+    ingredients = models.JSONField(blank=True, null=True)
+    instructions = models.JSONField(blank=True, null=True)
+    notes = models.JSONField(blank=True, null=True)
+    comment = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.name

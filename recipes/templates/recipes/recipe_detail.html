@@ -5,59 +5,192 @@
     <a href="{% url 'select_cook' %}" style="margin-right:1em;">Select Cook/Collection</a>
 {% endblock %}
 {% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-function printRecipe() {
-    window.print();
+function getPrintMode() {
+    return document.querySelector('input[name="printMode"]:checked').value;
+}
+function printRecipeWithMode() {
+    var mode = getPrintMode();
+    var img = document.getElementById('recipe-image');
+    var textSection = document.getElementById('recipe-text-section');
+    var imgDisplay = img ? img.style.display : '';
+    var textDisplay = textSection ? textSection.style.display : '';
+    if (mode === 'image') {
+        if (img) img.style.display = '';
+        if (textSection) textSection.style.display = 'none';
+        window.print();
+    } else if (mode === 'text') {
+        if (img) img.style.display = 'none';
+        if (textSection) textSection.style.display = '';
+        window.print();
+    } else {
+        if (img) img.style.display = '';
+        if (textSection) textSection.style.display = '';
+        window.print();
+    }
+    setTimeout(function() {
+        if (img) img.style.display = imgDisplay;
+        if (textSection) textSection.style.display = textDisplay;
+    }, 500);
 }
 
-async function copyImageToClipboard() {
-    const img = document.getElementById('recipe-image');
-    try {
-        const response = await fetch(img.src);
-        const blob = await response.blob();
-        await navigator.clipboard.write([
-            new window.ClipboardItem({ [blob.type]: blob })
-        ]);
-        alert('Recipe image copied to clipboard!');
-    } catch (err) {
-        alert('Failed to copy image. Your browser may not support this feature.');
+async function copyRecipeWithMode() {
+    var mode = getPrintMode();
+    var img = document.getElementById('recipe-image');
+    var textSection = document.getElementById('recipe-text-section');
+    var recipeName = document.querySelector('h1').innerText;
+    if (mode === 'image') {
+        if (img) {
+            try {
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new window.ClipboardItem({ [blob.type]: blob })
+                ]);
+                alert('Recipe image copied to clipboard!');
+            } catch (err) {
+                alert('Failed to copy image. Your browser may not support this feature.');
+            }
+        }
+    } else if (mode === 'text') {
+        if (textSection) {
+            // Create a temporary wrapper with the recipe name and text
+            var wrapper = document.createElement('div');
+            var nameElem = document.createElement('div');
+            nameElem.style.fontWeight = 'bold';
+            nameElem.style.fontSize = '1.5em';
+            nameElem.style.marginBottom = '0.5em';
+            nameElem.innerText = recipeName;
+            wrapper.appendChild(nameElem);
+            wrapper.appendChild(textSection.cloneNode(true));
+            wrapper.style.background = '#fff';
+            wrapper.style.padding = '1em';
+            document.body.appendChild(wrapper);
+            html2canvas(wrapper).then(function(canvas) {
+                canvas.toBlob(async function(blob) {
+                    try {
+                        await navigator.clipboard.write([
+                            new window.ClipboardItem({ [blob.type]: blob })
+                        ]);
+                        alert('Recipe text copied as image to clipboard!');
+                    } catch (err) {
+                        alert('Failed to copy text image. Your browser may not support this feature.');
+                    }
+                    document.body.removeChild(wrapper);
+                });
+            });
+        }
+    } else {
+        // Both: combine image and text (with name) into one canvas
+        if (img && textSection) {
+            // Create a temporary wrapper with the recipe name and text
+            var wrapper = document.createElement('div');
+            var nameElem = document.createElement('div');
+            nameElem.style.fontWeight = 'bold';
+            nameElem.style.fontSize = '1.5em';
+            nameElem.style.marginBottom = '0.5em';
+            nameElem.innerText = recipeName;
+            wrapper.appendChild(nameElem);
+            wrapper.appendChild(textSection.cloneNode(true));
+            wrapper.style.background = '#fff';
+            wrapper.style.padding = '1em';
+            document.body.appendChild(wrapper);
+            html2canvas(wrapper).then(function(textCanvas) {
+                var combinedCanvas = document.createElement('canvas');
+                var imgHeight = img.naturalHeight;
+                var imgWidth = img.naturalWidth;
+                var textHeight = textCanvas.height;
+                var textWidth = textCanvas.width;
+                var width = Math.max(imgWidth, textWidth);
+                var height = imgHeight + textHeight;
+                combinedCanvas.width = width;
+                combinedCanvas.height = height;
+                var ctx = combinedCanvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
+                ctx.drawImage(textCanvas, 0, imgHeight, textWidth, textHeight);
+                combinedCanvas.toBlob(async function(blob) {
+                    try {
+                        await navigator.clipboard.write([
+                            new window.ClipboardItem({ [blob.type]: blob })
+                        ]);
+                        alert('Recipe image and text copied as one image to clipboard!');
+                    } catch (err) {
+                        alert('Failed to copy combined image. Your browser may not support this feature.');
+                    }
+                    document.body.removeChild(wrapper);
+                });
+            });
+        }
     }
 }
 </script>
 {% endblock %}
 {% block content %}
-    <div style="display:flex; gap:2em; margin-bottom:2em;">
-        {% if cook_obj and 'http' in cook_obj.cook_head_shot %}
-            <img class="print-hide" src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% elif cook_obj and '/' in cook_obj.cook_head_shot %}
-            <img class="print-hide" src="{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% elif cook_obj %}
-            <img class="print-hide" src="/media/{{ cook_obj.cook_head_shot }}" alt="{{ cook_obj.cook_full }} Headshot" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% endif %}
-        {% if cook_obj and 'http' in cook_obj.recipe_box_image %}
-            <img class="print-hide" src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% elif cook_obj and '/' in cook_obj.recipe_box_image %}
-            <img class="print-hide" src="{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% elif cook_obj %}
-            <img class="print-hide" src="/media/{{ cook_obj.recipe_box_image }}" alt="{{ cook_obj.cook_app }}" style="height:80px; width:auto; border:2px solid #a67c52; border-radius:12px;">
-        {% endif %}
+    <div style="display:flex; align-items:center; gap:2em; margin-bottom:1em;">
+        <div class="print-hide" style="border:2px solid #a67c52; border-radius:12px; padding:1em; display:inline-block; background:#fff8f0;">
+            <div style="display:flex; gap:1em; justify-content:center; margin-bottom:0.5em;">
+                <button class="btn" onclick="printRecipeWithMode();">Print Recipe</button>
+                <button class="btn" onclick="copyRecipeWithMode();">Copy Selected to Clipboard</button>
+            </div>
+            <div style="display:flex; gap:1em; justify-content:center; border-top:1px solid #e0c8a0; padding-top:0.5em;">
+                <label><input type="radio" name="printMode" value="both" checked> Both</label>
+                <label><input type="radio" name="printMode" value="text"> Text</label>
+                <label><input type="radio" name="printMode" value="image"> Image</label>
+            </div>
+        </div>
     </div>
     <div class="print-copy-info" style="text-align:center; font-size:1.1em; margin-bottom:1em;">
         From {{ cook_obj.cook_app }}, {{ cook_obj.cook_full }}'s collection of recipes!
     </div>
-    <h1>{{ recipe.name }}</h1>
-    {% if recipe.is_favorite %}
-        <div>
-            <span class="star">⭐</span>
-            <span style="color:gold; font-weight:bold;">A family favorite recipe!</span>
-        </div>
-    {% endif %}
-    <button class="btn print-hide" onclick="printRecipe()">Print Recipe</button>
-    <button class="btn print-hide" onclick="copyImageToClipboard()">Copy Image to Clipboard</button>
+    <h1>
+        {% if recipe.title %}
+            {{ recipe.title }}
+        {% else %}
+            {{ recipe.name }}
+        {% endif %}
+        {% if recipe.is_favorite %}
+            <span style="font-size:0.55em;" class="star">⭐</span>
+            <span style="color:gold; font-weight:bold; font-size:0.55em;">A family favorite recipe!</span>
+        {% endif %}
+    </h1>
     <div style="margin:2em 0;">
         <img id="recipe-image" src="/media/{{ recipe.image }}" alt="{{ recipe.name }}" style="max-width:66%; border-radius:12px; box-shadow:0 2px 8px #d2b48c;">
     </div>
-    <div class="view-count print-hide">
-        Views: {{ recipe.view_count }}
+    <div id="recipe-text-section">
+    {% if recipe.description %}
+        <p class="desc">{{ recipe.description }}</p>
+    {% endif %}
+    {% if recipe.meta %}
+        <h3 style="margin-bottom:0.5em; color:#a67c52; font-family:inherit;">Good to know . . .</h3>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.5em; margin-bottom:1em;">
+        {% for key, value in recipe.meta.items %}
+            <div style="padding:0.25em 0;"><strong>{{ key }}:</strong> {{ value }}</div>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% if recipe.ingredients %}
+        <h3>Ingredients</h3>
+        <ul>
+        {% for item in recipe.ingredients %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% if recipe.instructions %}
+        <h3>Instructions</h3>
+        <ol>
+        {% for step in recipe.instructions %}
+            <li>{{ step }}</li>
+        {% endfor %}
+        </ol>
+    {% endif %}
+    {% if recipe.notes %}
+        <h3>Notes</h3>
+        <div class="notes">{{ recipe.notes }}</div>
+    {% endif %}
+    {% if recipe.comment %}
+        <div class="comment">{{ recipe.comment }}</div>
+    {% endif %}
     </div>
 {% endblock %}
