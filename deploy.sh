@@ -5,10 +5,10 @@
 set -e
 
 # Activate virtualenv
-source /home/bew123/cookbook/env/bin/activate
+source /home/bew123/recipe/myenv/bin/activate
 
 # Go to app directory
-cd /home/bew123/cookbook
+cd /home/bew123/recipe
 
 echo "Pulling latest code from GitHub..."
 git pull
