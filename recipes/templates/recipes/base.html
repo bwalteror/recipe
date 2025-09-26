@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block page_title %}Fern's Recipe Box{% endblock %}</title>
+    <title>{% block page_title %}cook_full & "'s Recipe Collection"{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -112,15 +112,40 @@
 </head>
 <body>
     <div class="navbar print-hide" style="justify-content:center;">
-        <div style="display:flex; align-items:center; justify-content:center; width:100%;">
-            <a href="{% url 'recipes:category_list' %}" style="text-decoration:none;">
-                <span style="font-size:2em; font-family:'Georgia',serif; font-weight:bold; color:#fffbe6; margin-right:2em; letter-spacing:1px;">
-                    {% block banner_title %}Fern's Recipe Box{% endblock %}
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; position:relative;">
+            <!-- Banner title, clickable to cook_app home if selected -->
+            <a href="{% if cook_obj and cook_obj.cook_app %}{% url 'recipes:category_list' %}{% else %}#{% endif %}" style="text-decoration:none;">
+                <span style="font-size:2em; font-family:'Georgia',serif; font-weight:bold; color:#fffbe6; margin-left:2em; letter-spacing:1px; cursor:pointer;">
+                    {% block banner_title %}{% if cook_obj and cook_obj.cook_app %}{{ cook_obj.cook_app }}{% else %}Fern's Recipe Box{% endif %}{% endblock %}
                 </span>
             </a>
-            {% block show_home_button %}<a href="{% url 'recipes:category_list' %}" style="margin-right:1em;">Home</a>{% endblock %}
-            <a href="{% url 'recipes:about_page' %}">About</a>
+            <!-- Hamburger Menu in top right corner of banner -->
+            <div id="menu-container" style="position:absolute; top:1em; right:2em; z-index:20;">
+                <div id="menu-icon" style="width:36px; cursor:pointer; padding:8px;" onclick="toggleMenu()">
+                    <div style="height:5px; background:#fffbe6; margin:6px 0; border-radius:2px;"></div>
+                    <div style="height:5px; background:#fffbe6; margin:6px 0; border-radius:2px;"></div>
+                    <div style="height:5px; background:#fffbe6; margin:6px 0; border-radius:2px;"></div>
+                </div>
+                <div id="menu-items" style="display:none; position:absolute; right:0; top:40px; background:#fff8f0; border:1px solid #e0c8a0; border-radius:8px; box-shadow:0 2px 8px #e0c8a0; min-width:180px; z-index:10;">
+                    <a href="{% url 'select_cook' %}" style="display:block; padding:1em; color:#a67c52; text-decoration:none; border-bottom:1px solid #e0c8a0;">Select Cook/Collection</a>
+                    <a href="{% url 'recipes:faq' %}" style="display:block; padding:1em; color:#a67c52; text-decoration:none; border-bottom:1px solid #e0c8a0;">FAQ</a>
+                    <a href="{% url 'recipes:about_page' %}" style="display:block; padding:1em; color:#a67c52; text-decoration:none;">About</a>
+                </div>
+            </div>
         </div>
+        <script>
+        function toggleMenu() {
+            var menu = document.getElementById('menu-items');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+        document.addEventListener('click', function(e) {
+            var icon = document.getElementById('menu-icon');
+            var menu = document.getElementById('menu-items');
+            if (!icon.contains(e.target) && !menu.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+        </script>
     </div>
     <div class="container">
         {% block content %}{% endblock %}
