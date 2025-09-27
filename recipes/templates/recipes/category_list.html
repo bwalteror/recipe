@@ -1,9 +1,6 @@
 {% extends "recipes/base.html" %}
 {% block page_title %}{{ cook_obj.cook_app }}{% endblock %}
-{% block banner_title %}{{ cook_obj.cook_app }}{% endblock %}
-{% block show_home_button %}
-    <a href="{% url 'select_cook' %}" style="margin-right:1em;">Select Cook/Collection</a>
-{% endblock %}
+{# banner_title and select_cook link removed #}
 {% block content %}
     <div style="display:flex; justify-content:center; align-items:flex-start; gap:2em; margin-bottom:2em; flex-wrap:wrap;">
         <div style="flex:1; min-width:150px; max-width:250px;">
